@@ -5,8 +5,7 @@
 -include_lib("eunit/include/eunit.hrl").
 
 %% Check are 2 float numbers equal with given precision
-is_equal(F1, F2, Precision) ->
-    false.
+is_equal(F1, F2, Precision) -> abs(F1 - F2) =< Precision.
 
 is_equal_test() ->
     ?assertEqual(true, is_equal(3.5, 3.5, 0.01)),

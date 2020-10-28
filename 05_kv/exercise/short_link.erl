@@ -8,16 +8,25 @@ init() ->
     %% init randomizer
     <<A:32, B:32, C:32>> = crypto:strong_rand_bytes(12),
     rand:seed(exsp, {A,B,C}),
-    State = your_state_structure,
+    State = dict:new(),
     State.
 
 
 create_short(LongLink, State) ->
-    your_result.
+    case dict:find(LongLink, State) of
+        {ok, ShortLink} -> {ShortLink, State};
+        error -> 
+            ShortLink = LongLink ++ "/" ++ rand_str(length(LongLink)),
+            NewState = dict:store(ShortLink, LongLink, State),
+            NewNewState = dict:store(LongLink, ShortLink, NewState),
+            {ShortLink, NewNewState}
+    end.
 
 get_long(ShortLink, State) ->
-    {error, not_found}.
-
+    case dict:find(ShortLink, State) of
+        {ok, LongLink} -> {ok, LongLink};
+        error -> {error, not_found}
+    end.
 
 %% generates random string of chars [a-zA-Z0-9]
 rand_str(Length) ->

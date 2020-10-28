@@ -6,8 +6,9 @@
 
 %% implement lists:any/2
 %% http://www.erlang.org/doc/man/lists.html#any-2
-any(Pred, List) ->
-    false.
+any(_, []) -> false;
+any(Pred, [H | T]) -> Pred(H) or any(Pred, T).
+
 
 
 any_test() ->
@@ -23,8 +24,9 @@ any_test() ->
 
 %% implement lists:all/2
 %% http://www.erlang.org/doc/man/lists.html#all-2
-all(Pred, List) ->
-    false.
+all(_, []) -> true;
+all(Pred, [H | T]) -> Pred(H) and all(Pred, T).
+
 
 
 all_test() ->

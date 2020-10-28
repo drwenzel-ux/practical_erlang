@@ -60,7 +60,46 @@ sample_champ() ->
 
 
 get_stat(Champ) ->
-    {0, 0, 0.0, 0.9}.
+    TeamsStat = lists:map(fun get_team_stat/1, Champ),
+	F = fun({TeamPlayers, TeamAge, TeamRating}, {P, A, R}) -> 
+		{P + TeamPlayers, A + TeamAge, R + TeamRating} end, 
+    {TotalPlayers, TotalAge, TotalRating} =
+        lists:foldl(F, {0, 0, 0}, TeamsStat),
+    {length(Champ), TotalPlayers, TotalAge / TotalPlayers, TotalRating / TotalPlayers}.
+
+get_team_stat({team, _, Players}) ->
+	F = fun({player, _, Age, Rating, _}, {TotalAge, TotalRating}) ->
+                  {TotalAge + Age, TotalRating + Rating}
+          end,
+    {TeamAge, TeamRating} =
+        lists:foldl(F, {0, 0}, Players),
+    {length(Players), TeamAge, TeamRating}.
+
+% get_stat(Champ) ->
+% 	% count players
+% 	Count = fun ({player, _, _, _, _}, NumPlayers) ->
+% 			NumPlayers + 1
+% 		end,
+% 	% average age
+% 	AvgA = fun ({player, _, Age, _, _}, AvgAgeTeam) ->
+% 		  AvgAgeTeam + Age
+% 	  end,
+% 	% average rate
+% 	AvgR = fun ({player, _, _, Rate, _}, AvgRate) ->
+% 		AvgRate + Rate
+% 	end,
+% 	% master fun
+% 	Master = fun ({team, _, Team},
+% 		{NumTeams, NumPlayers, AvgAges, AvgRates}) ->
+% 			{
+% 				NumTeams + 1, 
+% 				NumPlayers + lists:foldl(Count, 0, Team),
+% 				AvgAges + lists:foldl(AvgA, 0, Team), 
+% 				AvgRates + lists:foldl(AvgR, 0, Team)
+% 			}
+% 		end,
+% 	{NumTeams, NumPlayers, AvgAges, AvgRates} = lists:foldl(Master, {0, 0, 0, 0}, Champ), 
+% 	{NumTeams, NumPlayers, AvgAges / NumPlayers, AvgRates / NumPlayers}.
 
 
 get_stat_test() ->
@@ -68,9 +107,14 @@ get_stat_test() ->
     ok.
 
 
-filter_sick_players(Champ) ->
-    Champ.
+filter_sick_players(Champ) -> 
+	Teams = lists:map(fun filter_sick_players_teams/1, Champ),
+	lists:filter(fun({team, _, Players}) -> length(Players) >= 5 end, Teams).
 
+
+filter_sick_players_teams({team, Name, Players})-> 
+	New = lists:filter(fun({player, _,_, _, Health}) -> Health >= 50 end, Players),
+	{team, Name, New}.
 
 filter_sick_players_test() ->
     Result = [{team, "Crazy Bulls",
@@ -104,8 +148,13 @@ filter_sick_players_test() ->
     ok.
 
 
-make_pairs(Team1, Team2) ->
-    [].
+make_pairs({team, _, Team1}, {team, _, Team2}) ->
+	[
+		{Name1, Name2} ||
+		{player, Name1, _, Rate1, _} <- Team1, 
+		{player, Name2, _, Rate2, _} <- Team2, 
+		Rate1 + Rate2 > 600
+	].
 
 
 make_pairs_test() ->

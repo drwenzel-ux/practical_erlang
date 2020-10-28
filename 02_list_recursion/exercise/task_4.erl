@@ -7,8 +7,13 @@
 
 %% implement lists:dropwhile/2
 %% http://www.erlang.org/doc/man/lists.html#dropwhile-2
+dropwhile(_, []) -> [];
 dropwhile(Pred, List) ->
-    List.
+    [H | T] = List, 
+    case Pred(H) of 
+        true -> dropwhile(Pred, T);
+        false -> List
+    end.
 
 
 dropwhile_test() ->
@@ -21,12 +26,31 @@ dropwhile_test() ->
     ?assertEqual([3,32,4,32], dropwhile(F, [32,32,32,32,32,32,3,32,4,32])),
     ok.
 
+% dropwhile(_, []) -> [];
+% dropwhile(Pred, List) -> dropwhile(Pred, List, start, []).
+% dropwhile(Pred, [H|T], start, Result) -> dropwhile(Pred, [H|T], Pred(H), Result);
+% dropwhile(Pred, [H|T], true, Result) -> dropwhile(Pred, T, Pred(H), [H|Result]);
+% dropwhile(_, _, false, Result) -> Result.
+
+
+% takewhile(_, []) -> [];
+% takewhile(Pred, List) -> takewhile(Pred, List, check, []).
+
+% takewhile(Pred, [H|T], check, Acc) -> Case = Pred(H), takewhile(Pred, [H|T], Case, Acc);
+% takewhile(Pred, [H|T], true, Acc) -> takewhile(Pred, T, check, [H|Acc]);
+% takewhile(_, _, false, Acc) -> task_2:reverse(Acc).
+
+
 
 %% implement lists:takewhile/2
 %% http://www.erlang.org/doc/man/lists.html#takewhile-2
-takewhile(Pred, List) ->
-    List.
-
+takewhile(_, []) -> [];
+takewhile(Pred, List) -> 
+    [H | T] = List, 
+    case Pred(H) of
+        true -> [H | takewhile(Pred, T)];
+        false -> takewhile(Pred, [])
+    end.
 
 takewhile_test() ->
     F = fun(Val) -> Val =:= 32 end,

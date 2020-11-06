@@ -1,10 +1,19 @@
 -module(chat_room_manager).
 
--export([loop/1, call/2, handle_call/2,
-         start/0,
-         create_room/2, remove_room/2, get_rooms/1,
-         add_user/3, remove_user/3, get_users_list/2,
-         send_message/4,  get_messages_history/2]).
+-export([
+    loop/1, 
+    call/2, 
+    handle_call/2,
+    start/0,
+    create_room/2, 
+    remove_room/2, 
+    get_rooms/1,
+    add_user/3,
+    remove_user/3,
+    get_users_list/2,
+    send_message/4,
+    get_messages_history/2
+]).
 
 
 start() ->

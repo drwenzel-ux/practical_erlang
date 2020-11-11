@@ -157,8 +157,8 @@ call(Pid, Msg) ->
         {'DOWN', Ref, process, Pid, Reason} ->
             {error, Reason}
     after 5000 ->
-            erlang:demonitor(Ref, [flush]),
-            noreply
+        erlang:demonitor(Ref, [flush]),
+        noreply
     end.
 
 
